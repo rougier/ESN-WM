@@ -13,23 +13,24 @@ from model import generate_model, train_model, test_model
 if __name__ == '__main__':
     
     # Random generator initialization
-    np.random.seed(3)
+    np.random.seed(1)
     
     # Build memory
-    model = generate_model(shape=(2,1000,1), sparsity=0.25, radius=0.1,
-                        scaling=0.25, leak=0.75, noise=0.0001)
+    n_gate = 1
+    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
+                        scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
     n = 25000
     values = np.random.uniform(-1, +1, n)
-    ticks = np.random.uniform(0, 1, n) < 0.01
+    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
 
     # Testing data
     n = 2500
     values = smoothen(np.random.uniform(-1, +1, n))
-    ticks = np.random.uniform(0, 1, n) < 0.01
-    test_data = generate_data(values, ticks)
+    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
+    test_data = generate_data(values, ticks, last = train_data["output"][-1])
     
     error = train_model(model, train_data)
     print("Training error : {0}".format(error))
@@ -38,25 +39,22 @@ if __name__ == '__main__':
     print("Testing error : {0}".format(error))
 
 
-    
-    # Display
+        # Display
     fig = plt.figure(figsize=(14,8))
     fig.patch.set_alpha(0.0)
     n_subplots = 4
 
     data = test_data
-    
+
     ax1 = plt.subplot(n_subplots, 1, 1)
     ax1.tick_params(axis='both', which='major', labelsize=8)
     ax1.plot(data["input"][:,0],  color='0.75', lw=1.0)
     ax1.plot(data["output"],  color='0.75', lw=1.0)
     ax1.plot(model["output"], color='0.00', lw=1.5)
-
     X, Y = np.arange(len(data)), np.ones(len(data))
     C = np.zeros((len(data),4))
     C[:,3] = data["input"][:,1]
     ax1.scatter(X, -0.9*Y, s=1, facecolors=C, edgecolors=None)
-    
     ax1.text(-25, -0.9, "Ticks:",
              fontsize=8, transform=ax1.transData,
              horizontalalignment="right", verticalalignment="center")
@@ -115,7 +113,5 @@ if __name__ == '__main__':
              horizontalalignment="left", verticalalignment="top")
     
     plt.tight_layout()
-    plt.savefig("working-memory.pdf")
+    # plt.savefig("WM-one-gate.pdf")
     plt.show()
-
-    

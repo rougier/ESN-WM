@@ -16,8 +16,8 @@ if __name__ == '__main__':
     np.random.seed(3)
     
     # Build memory
-    model = generate_model(shape=(2,1000,1), sparsity=0.25, radius=0.1,
-                        scaling=0.25, leak=0.75, noise=0.0001)
+    model = generate_model(shape=(2,200,1), sparsity=0.5, radius=0.1,
+                        scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
     n = 25000
@@ -27,8 +27,10 @@ if __name__ == '__main__':
 
     # Testing data
     n = 2500
-    values = smoothen(np.random.uniform(-1, +1, n))
-    ticks = np.random.uniform(0, 1, n) < 0.01
+    theta = np.linspace(0,20*np.pi,n)
+    values = np.cos(theta)
+    ticks = np.zeros(n)
+    ticks[::25] = 1
     test_data = generate_data(values, ticks)
     
     error = train_model(model, train_data)
@@ -38,7 +40,6 @@ if __name__ == '__main__':
     print("Testing error : {0}".format(error))
 
 
-    
     # Display
     fig = plt.figure(figsize=(14,8))
     fig.patch.set_alpha(0.0)
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     ax2 = plt.subplot(n_subplots, 1, 2, sharex=ax1)
     ax2.tick_params(axis='both', which='major', labelsize=8)
     ax2.plot(model["output"]-data["output"],  color='red', lw=1.0)
-    ax2.set_ylim(-0.011, +0.011)
+    #ax2.set_ylim(-0.011, +0.011)
     ax2.yaxis.tick_right()
     ax2.axhline(0, color='.75', lw=.5)
     ax2.set_ylabel("Output error")
@@ -115,7 +116,5 @@ if __name__ == '__main__':
              horizontalalignment="left", verticalalignment="top")
     
     plt.tight_layout()
-    plt.savefig("working-memory.pdf")
+#    plt.savefig("working-memory.pdf")
     plt.show()
-
-    
