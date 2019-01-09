@@ -13,7 +13,7 @@ from model import generate_model, train_model, test_model
 if __name__ == '__main__':
     
     # Random generator initialization
-    np.random.seed(1)
+    np.random.seed(123)
     
     # Build memory
     n_gate = 1
@@ -21,13 +21,13 @@ if __name__ == '__main__':
                         scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
-    n = 25000
+    n = 10000
     values = np.random.uniform(-1, +1, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
 
     # Testing data
-    n = 2500
+    n = 2000
     values = smoothen(np.random.uniform(-1, +1, n))
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     test_data = generate_data(values, ticks, last = train_data["output"][-1])
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     error = test_model(model, test_data)
     print("Testing error : {0}".format(error))
 
-
-        # Display
+    
+    # Display
     fig = plt.figure(figsize=(14,8))
     fig.patch.set_alpha(0.0)
     n_subplots = 4

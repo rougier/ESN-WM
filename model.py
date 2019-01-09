@@ -64,7 +64,6 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
              "W_out"    : None }
 
 
-
 def train_model(model, data, seed=None): 
     """ Train the model using provided data and seed (noise). """
 
@@ -89,10 +88,8 @@ def train_model(model, data, seed=None):
     # Computing W_out over a subset of reservoir units
     W_out = np.dot(np.linalg.pinv(internals), outputs).T
     error = np.sqrt(np.mean((np.dot(internals, W_out.T) - outputs)**2))
-
     model["W_out"] = W_out
     model["last_state"] = inputs[-1], internals[-1], outputs[-1]
-
     return error
 
 

@@ -11,30 +11,31 @@ from model import generate_model, train_model, test_model
 
 
 if __name__ == '__main__':
-    
+
     # Random generator initialization
-    np.random.seed(3)
+    np.random.seed(1)
     
     # Build memory
-    model = generate_model(shape=(2,200,1), sparsity=0.5, radius=0.1,
+    n_gate = 1
+    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
                         scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
     n = 25000
     values = np.random.uniform(-1, +1, n)
-    ticks = np.random.uniform(0, 1, n) < 0.01
+    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
+
+    error = train_model(model, train_data)
+    print("Training error : {0}".format(error))
+    
 
     # Testing data
     n = 2500
-    theta = np.linspace(0,20*np.pi,n)
-    values = np.cos(theta)
+    values = np.cos(np.linspace(0,20*np.pi,n))
     ticks = np.zeros(n)
     ticks[::25] = 1
-    test_data = generate_data(values, ticks)
-    
-    error = train_model(model, train_data)
-    print("Training error : {0}".format(error))
+    test_data = generate_data(values, ticks, last = train_data["output"][-1])
     
     error = test_model(model, test_data)
     print("Testing error : {0}".format(error))
