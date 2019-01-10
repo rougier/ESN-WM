@@ -55,8 +55,25 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
 
 
     W_rc = rng.uniform(-0.5, 0.5, (shape[1], shape[1]))
+    # Display eigen-spectrum for pure random reservoir
+    plt.figure(figsize=(14,9))
+    w, v = np.linalg.eig(W_rc)
+    plt.scatter(w.real, w.imag, c='b', label='raw reservoir')
+    plt.axvline(linewidth=1, color='k')
+    plt.axhline(linewidth=1, color='k')
+    plt.title("Eigenspectrum before and after applying chosen spectral radius")
+
     W_rc[rng.uniform(0.0, 1.0, W_rc.shape) > sparsity] = 0.0
+    # Display eigen-spectrum for sparse reservoir
+    w, v = np.linalg.eig(W_rc)
+    plt.scatter(w.real, w.imag, c='g', label='sparse')
+
     W_rc *= radius / np.max(np.abs(np.linalg.eigvals(W_rc)))
+    # Display eigen-spectrum for sparse reservoir with applyed specrad
+    w, v = np.linalg.eig(W_rc)
+    plt.scatter(w.real, w.imag, c='r', label='spectral radius')
+    plt.legend()
+    plt.savefig("eigenspectrum-before-and-after-specrad.pdf")
 
     # W_fb = rng.uniform(-1.0, 1.0, (shape[1], shape[2]))
     W_fb = rng.choice([-1.0, -0.5, 0.0, +0.5, +1.0],(shape[1],shape[2]))
@@ -217,8 +234,10 @@ if __name__ == '__main__':
     np.random.seed(3)
 
     # Build the model
-    model = generate_model(shape=(2,50,1), sparsity=0.5, radius=0.0,
-                           scaling=0.25, leak=0.5, noise=0.000)
+    # model = generate_model(shape=(2,50,1), sparsity=0.5, radius=0.0,
+    model = generate_model(shape=(2,100,1), sparsity=0.2, radius=0.05, #xav: changed specrad for eigenspectrum plot
+                           # scaling=0.25, leak=0.5, noise=0.000)
+                           scaling=0.25, leak=0.5, noise=0.0001)
 
     # Training
     data = generate_data(25000, p=0.01, smooth=False)
@@ -229,6 +248,21 @@ if __name__ == '__main__':
     data = generate_data(2500, p=0.01, seed=1, smooth=True)
     error = test(model, data)
     print("Testing error : {0}".format(error))
+
+
+    # Display eigen-spectrum for reservoir and "ré-écriture"
+    plt.figure(figsize=(14,9))
+    w, v = np.linalg.eig(model["W_rc"])
+    plt.scatter(w.real, w.imag, c='b', label='spectral radius')
+    plt.axvline(linewidth=1, color='k')
+    plt.axhline(linewidth=1, color='k')
+
+    Wprime = model["W_rc"] + np.dot(model["W_fb"], model["W_out"])
+    w, v = np.linalg.eig(Wprime)
+    plt.scatter(w.real, w.imag, c='r', label='reecriture')
+    plt.legend()
+    plt.savefig("eigenspectrum-reecriture.pdf")
+
 
     # Display
     plt.figure(figsize=(14,9))
