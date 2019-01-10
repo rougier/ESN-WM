@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Gated working memory with an echo state network
 # Copyright (c) 2018 Nicolas P. Rougier
@@ -21,10 +22,10 @@ def smoothen(Z, window='hanning', length=25):
     length: int
         Size of the averaging window
     """
-    
+
     # window in 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     S = np.r_[Z[length-1:0:-1], Z, Z[-2:-length-1:-1]]
-    if window == 'flat': 
+    if window == 'flat':
         W = np.ones(length,'d')
     else:
         W = eval('np.' + window + '(length)')
@@ -43,7 +44,7 @@ def generate_data(values, ticks, last=None):
         Input signal as a single sequence of random float
 
     ticks : np.array
-        Gating signal(s) as one (or several) sequence(s) of 0 and 1 
+        Gating signal(s) as one (or several) sequence(s) of 0 and 1
     """
 
     values = np.array(values).ravel()
@@ -52,7 +53,7 @@ def generate_data(values, ticks, last=None):
         ticks = ticks.reshape(len(ticks), 1)
     n_gate = ticks.shape[1]
     size = len(values)
-    
+
     data = np.zeros(size, dtype = [ ("input",  float, (1 + n_gate,)),
                                     ("output", float, (    n_gate,))])
     # Input signals
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     ticks = np.random.uniform(0, 1, (n,2)) < 0.01
     data = generate(values, ticks)
     print("Data size: {0}".format(len(data)))
-    print("Data dtype: {0}".format(data.dtype))    
+    print("Data dtype: {0}".format(data.dtype))
 
     plt.figure(figsize=(12,2.5))
     plt.plot(data["input"][:,0],  color='0.75', lw=1.0)
@@ -95,5 +96,3 @@ if __name__ == '__main__':
     plt.ylim(-1,1)
     plt.tight_layout()
     plt.show()
-    
-    

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Gated working memory with an echo state network
 # Copyright (c) 2018 Nicolas P. Rougier
@@ -45,21 +46,21 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
     rng = np.random
     if seed is not None:
         rng = np.random.mtrand.RandomState(seed)
-    
+
     # Reservoir building
     W_in = rng.uniform(-1.0, 1.0, (shape[1], shape[0]))
-    
+
     W_in[:,0] = rng.choice([-1.0, -0.5, 0.0, +0.5, +1.0],shape[1])
     W_in[:,1] = rng.choice([0, 1], shape[1])
 
-    
+
     W_rc = rng.uniform(-0.5, 0.5, (shape[1], shape[1]))
     W_rc[rng.uniform(0.0, 1.0, W_rc.shape) > sparsity] = 0.0
     W_rc *= radius / np.max(np.abs(np.linalg.eigvals(W_rc)))
 
     # W_fb = rng.uniform(-1.0, 1.0, (shape[1], shape[2]))
     W_fb = rng.choice([-1.0, -0.5, 0.0, +0.5, +1.0],(shape[1],shape[2]))
-        
+
     return { "shape"    : shape,
              "sparsity" : sparsity,
              "scaling"  : scaling,
@@ -87,10 +88,10 @@ def smoothen(Z, window='hanning', length=25):
     length: int
         Size of the averaging window
     """
-    
+
     # window in 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     S = np.r_[Z[length-1:0:-1], Z, Z[-2:-length-1:-1]]
-    if window == 'flat': 
+    if window == 'flat':
         W = np.ones(length,'d')
     else:
         W = eval('np.' + window + '(length)')
@@ -109,7 +110,7 @@ def generate_data(size=10000, p=0.01, seed=None, smooth=False):
     size : int
         Number of data to generate
 
-    p : float 
+    p : float
         Probabilities of a tick in the gating signal
     """
 
@@ -128,7 +129,7 @@ def generate_data(size=10000, p=0.01, seed=None, smooth=False):
         data["input"][:, idx_value] = S[length:]
     else:
         data["input"][:, idx_value] = rng.uniform(-1, +1, size)
-    
+
     # Input ticks
     data["input"][:, idx_tick] = rng.uniform(0, 1, size) < p
 
@@ -141,13 +142,13 @@ def generate_data(size=10000, p=0.01, seed=None, smooth=False):
         if data["input"][i, idx_tick] > 0:
             wm = data["input"][i, idx_value]
         data["output"][i,0] = wm
-        
+
     return data
 
 
 
 # -----------------------------------------------------------------------------
-def train(model, data, seed=None): 
+def train(model, data, seed=None):
     """ Train the model using provided data. """
 
     # Get a random generator
@@ -185,7 +186,7 @@ def test(model, data, seed=None):
     rng = np.random
     if seed is not None:
         rng = np.random.mtrand.RandomState(seed)
-    
+
     last_input, last_internal, last_output = model["last_state"]
     inputs    = np.vstack([last_input, data["input"]])
     internals = np.vstack([last_internal, np.zeros((len(data), model["shape"][1]))])
@@ -211,10 +212,10 @@ def test(model, data, seed=None):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    
+
     # Random generator initialization
     np.random.seed(3)
-    
+
     # Build the model
     model = generate_model(shape=(2,50,1), sparsity=0.5, radius=0.0,
                            scaling=0.25, leak=0.5, noise=0.000)
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     data = generate_data(25000, p=0.01, smooth=False)
     error = train(model, data)
     print("Training error : {0}".format(error))
-    
+
     # Testing
     data = generate_data(2500, p=0.01, seed=1, smooth=True)
     error = test(model, data)
@@ -232,7 +233,7 @@ if __name__ == '__main__':
     # Display
     plt.figure(figsize=(14,9))
     n_subplots = 5
-    
+
     ax1 = plt.subplot(n_subplots, 1, 1)
     ax1.plot(data["output"],  color='0.75', lw=1.0)
     ax1.plot(model["output"], color='0.00', lw=1.5)
@@ -268,7 +269,7 @@ if __name__ == '__main__':
     ax3.yaxis.tick_right()
     ax3.set_ylabel("Most correlated\n internal units ({0})".format(n))
 
- 
+
     # Testing without feedback
     model["scaling"] = 0
     test(model, data)
@@ -287,8 +288,6 @@ if __name__ == '__main__':
 
     ax5.yaxis.tick_right()
     ax5.set_ylabel("Most correlated\n(no feedback)\n internal units ({0})".format(n))
-    
+
     plt.tight_layout()
     plt.show()
-
-    
