@@ -30,8 +30,8 @@ def noisypositive_nonlinear_update(m,v,noise_gain):
 
 def init_states(dim, init_scale, nr_timesteps):
     x = np.zeros((dim, nr_timesteps))
-    x[:,0] = np.random.rand((dim)) * init_scale
-    # x[:,0] = v1 * 0.1
+    # x[:,0] = np.random.rand((dim)) * init_scale
+    x[:,0] = v1 * 0.7
     return x
 
 def plot_states(x, title="", save=False):
