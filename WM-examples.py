@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # Random generator initialization
     np.random.seed(1)
-    
+
     # Build memory
     n_gate = 1
     model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     error = train_model(model, train_data)
     print("Training error : {0}".format(error))
-    
+
 
     # Testing data
     n = 2500
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     ticks = np.zeros(n)
     ticks[::25] = 1
     test_data = generate_data(values, ticks, last = train_data["output"][-1])
-    
+
     error = test_model(model, test_data)
     print("Testing error : {0}".format(error))
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     n_subplots = 4
 
     data = test_data
-    
+
     ax1 = plt.subplot(n_subplots, 1, 1)
     ax1.tick_params(axis='both', which='major', labelsize=8)
     ax1.plot(data["input"][:,0],  color='0.75', lw=1.0)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     C = np.zeros((len(data),4))
     C[:,3] = data["input"][:,1]
     ax1.scatter(X, -0.9*Y, s=1, facecolors=C, edgecolors=None)
-    
+
     ax1.text(-25, -0.9, "Ticks:",
              fontsize=8, transform=ax1.transData,
              horizontalalignment="right", verticalalignment="center")
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     ax4.text(0.01, 0.9, "D",
              fontsize=16, fontweight="bold", transform=ax4.transAxes,
              horizontalalignment="left", verticalalignment="top")
-    
+
     plt.tight_layout()
 #    plt.savefig("working-memory.pdf")
     plt.show()

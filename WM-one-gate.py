@@ -11,10 +11,10 @@ from model import generate_model, train_model, test_model
 
 
 if __name__ == '__main__':
-    
+
     # Random generator initialization
     np.random.seed(123)
-    
+
     # Build memory
     n_gate = 1
     model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
@@ -31,14 +31,14 @@ if __name__ == '__main__':
     values = smoothen(np.random.uniform(-1, +1, n))
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     test_data = generate_data(values, ticks, last = train_data["output"][-1])
-    
+
     error = train_model(model, train_data)
     print("Training error : {0}".format(error))
-    
+
     error = test_model(model, test_data)
     print("Testing error : {0}".format(error))
 
-    
+
     # Display
     fig = plt.figure(figsize=(14,8))
     fig.patch.set_alpha(0.0)
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     ax4.text(0.01, 0.9, "D",
              fontsize=16, fontweight="bold", transform=ax4.transAxes,
              horizontalalignment="left", verticalalignment="top")
-    
+
     plt.tight_layout()
     # plt.savefig("WM-one-gate.pdf")
     plt.show()

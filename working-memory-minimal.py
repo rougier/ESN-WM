@@ -235,7 +235,7 @@ if __name__ == '__main__':
 
     # Build the model
     # model = generate_model(shape=(2,50,1), sparsity=0.5, radius=0.0,
-    model = generate_model(shape=(2,100,1), sparsity=0.2, radius=0.05, #xav: changed specrad for eigenspectrum plot
+    model = generate_model(shape=(2,100,1), sparsity=0.2, radius=0.00, #xav: changed specrad for eigenspectrum plot
                            # scaling=0.25, leak=0.5, noise=0.000)
                            scaling=0.25, leak=0.5, noise=0.0001)
 
