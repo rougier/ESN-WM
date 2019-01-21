@@ -146,7 +146,8 @@ if __name__ == '__main__':
     np.random.seed(1)
     
     text = "Hello world!"
-    Z, I = generate_data(text, 20, zmin=1.0, zmax=1.0, kerning=False)
+    text = [chr(ord("0") +i) for i in np.random.randint(0,10,50)]
+    Z, I = generate_data(text, 11, zmin=1.0, zmax=1.0, kerning=False)
     
     # Mean character size
     print("Mean character size {0:.2f}x{1:.2f}".format(
@@ -166,8 +167,9 @@ if __name__ == '__main__':
     plt.savefig(filename, transparent=True)
 
     # OSX/iTerm specific
-    # from subprocess import call
-    # call(["imgcat", filename])
+    from subprocess import call
+    call(["imgcat", filename])
 
     # System agnostic
-    plt.show()
+    plt.savefig("textual-1-gate-task.pdf")
+    # plt.show()
