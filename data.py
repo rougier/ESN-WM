@@ -75,8 +75,11 @@ def generate_data(values, ticks, last=None):
     # Output value(s) according to ticks
     for i in range(size):
         for j in range(n_gate):
+            # Output at time of tick is not changed
+            # data["output"][i,j] = wm[j]
             if data["input"][i,1+j] > 0:
                 wm[j] = data["input"][i,0]
+            # Output at time of tick is changed
             data["output"][i,j] = wm[j]
 
     return data

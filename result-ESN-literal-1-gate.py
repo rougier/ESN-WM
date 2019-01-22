@@ -215,7 +215,7 @@ if __name__ == '__main__':
     
     ax2 = plt.subplot(2,1,2)
     ax2.tick_params(axis='both', which='major', labelsize=8)
-    ax2.plot(model["output"]-data["output"],  color='red', lw=1.0)
+    ax2.plot(model["output"]-data["output"],  color='red', lw=1.0, zorder=10)
     ax2.set_ylim(-0.11, +0.11)
     ax2.yaxis.tick_right()
     ax2.axhline(0, color='.75', lw=.5)
