@@ -113,7 +113,7 @@ def str_to_bmp(text, size=11, zmin=1.0, zmax=1.0, add_kerning=False):
         glyph = scipy.ndimage.zoom(glyph, (1, zoom), order=3)
         w = glyph.shape[1]
         x += kerning
-        left = 0
+        # left = 0
         Z[y:y+h,x+left:x+left+w] += glyph
         I[x:x+w] = ord(c)
         x += advance
@@ -126,6 +126,11 @@ def convert_data(data_, size):
     values = (data_["input"][:, 0]).astype(int)
     text = [chr(ord("0")+i) for i in values]
     Z, I = str_to_bmp(text, size = size)
+    Z = Z [3:-3]
+    
+    # Z *= np.random.uniform(0.9,1.1,Z.shape)
+    # Z = np.maximum(np.minimum(Z,1),0)
+    
     data = np.zeros(Z.shape[1], dtype = [ ("input",  float, (1 + Z.shape[0],)),
                                           ("output", float, (    n_gate,))])
     data["input"][:, :-1] = Z.T
@@ -147,7 +152,7 @@ if __name__ == '__main__':
     size = 11
 
     # Training data
-    n = 5000
+    n = 25000
     values = np.random.randint(0, 10, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.1
     train_data_ = generate_data(values, ticks)
@@ -157,7 +162,7 @@ if __name__ == '__main__':
     # Testing data
     n = 50
     values = np.random.randint(0, 10, n)
-    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.1
+    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.15
     test_data_ = generate_data(values, ticks, last = train_data_["output"][-1])
     test_data = convert_data(test_data_, size)
 
@@ -183,7 +188,7 @@ if __name__ == '__main__':
 
     Z = test_data["input"][:, :-1].T
     ax1.imshow(Z, interpolation='nearest', origin='upper', cmap="gray_r",
-               extent=[0,len(data),1.1,1.4], aspect='auto')
+               extent=[0,len(data),1.225,1.4], aspect='auto')
 
     
     ax1.tick_params(axis='both', which='major', labelsize=8)

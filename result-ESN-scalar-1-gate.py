@@ -17,8 +17,8 @@ if __name__ == '__main__':
 
     # Build memory
     n_gate = 1
-    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
-                        scaling=0.25, leak=1.0, noise=0.0001)
+    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5,
+                           radius=0.01, scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
     n = 10000
@@ -113,5 +113,5 @@ if __name__ == '__main__':
              horizontalalignment="left", verticalalignment="top")
 
     plt.tight_layout()
-    # plt.savefig("WM-one-gate.pdf")
+    plt.savefig("result-ESN-1-gate.pdf")
     plt.show()

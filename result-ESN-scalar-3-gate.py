@@ -17,8 +17,8 @@ if __name__ == '__main__':
 
     # Build memory
     n_gate = 3
-    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5, radius=0.01,
-                        scaling=0.25, leak=1.0, noise=0.0001)
+    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5,
+                           radius=0.1, scaling=0.25, leak=1.0, noise=0.0001)
 
     # Training data
     n = 25000
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # Testing data
     n = 2500
-    values = np.random.uniform(-1, +1, n)
+    values = smoothen(np.random.uniform(-1, +1, n))
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     test_data = generate_data(values, ticks, last = train_data["output"][-1])
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
 
     # Display
-    fig = plt.figure(figsize=(14,5))
+    fig = plt.figure(figsize=(14,4))
     fig.patch.set_alpha(0.0)
     n_subplots = 2
 
@@ -48,15 +48,15 @@ if __name__ == '__main__':
 
     ax1 = plt.subplot(n_subplots, 1, 1)
     ax1.tick_params(axis='both', which='major', labelsize=8)
-    # ax1.plot(data["input"][:,0],  color='0.75', lw=1.0)
-    ax1.plot(data["output"],  color='0.75', lw=1.0)
-    ax1.plot(model["output"], color='0.00', lw=1.5)
+    ax1.plot(data["input"][:,0],  color='0.75', lw=1.0)
 
     X, Y = np.arange(len(data)), np.ones(len(data))
     for i in range(n_gate):
         C = np.zeros((len(data),4))
         C[:,3] = data["input"][:,1+i]
         ax1.scatter(X, -1.05*Y-0.04*i, s=1.5, facecolors=C, edgecolors=None)
+        ax1.plot(data["output"][:,i],  color='0.75', lw=1.0)
+        ax1.plot(model["output"][:,i], lw=1.5, zorder=10)
 
     ax1.text(-25, -1.05, "Ticks:",
              fontsize=8, transform=ax1.transData,
@@ -71,8 +71,10 @@ if __name__ == '__main__':
 
     ax2 = plt.subplot(n_subplots, 1, 2, sharex=ax1)
     ax2.tick_params(axis='both', which='major', labelsize=8)
-    ax2.plot(model["output"]-data["output"],  color='red', lw=1.0)
-    #ax2.set_ylim(-0.011, +0.011)
+    for i in range(n_gate):
+        ax2.plot(model["output"]-data["output"],  lw=1.0)
+        
+    # ax2.set_ylim(-0.011, +0.011)
     ax2.yaxis.tick_right()
     ax2.axhline(0, color='.75', lw=.5)
     ax2.set_ylabel("Output error")
@@ -82,5 +84,5 @@ if __name__ == '__main__':
 
 
     plt.tight_layout()
-#    plt.savefig("working-memory.pdf")
+    plt.savefig("result-ESN-3-gate.pdf")
     plt.show()

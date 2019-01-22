@@ -81,5 +81,5 @@ if __name__ == '__main__':
     
    
     plt.tight_layout()
-    plt.savefig("minimal-model-3.pdf")
+    plt.savefig("result-RM-1-gate.pdf")
     plt.show()
