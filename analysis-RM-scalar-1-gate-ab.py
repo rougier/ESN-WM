@@ -109,6 +109,6 @@ ax1.set_xlabel("Time")
 
 plt.tight_layout()
 # plt.savefig("small_a{:s}_b{:s}.pdf".format(str(a_s), str(b_s)))
-plt.savefig("analysis-RM-scale-1-gate-ab.pdf")
+plt.savefig("analysis-RM-scalar-1-gate-ab.pdf")
 plt.show()
 
