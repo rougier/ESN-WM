@@ -117,5 +117,5 @@ if __name__ == '__main__':
              horizontalalignment="left", verticalalignment="top")
 
     plt.tight_layout()
-#    plt.savefig("working-memory.pdf")
+    plt.savefig("result-ESN-1-gate-cos.pdf")
     plt.show()
