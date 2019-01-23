@@ -18,6 +18,11 @@ from model_with_output_noise import generate_model, train_model, test_model
 #TODO: faire un feedback partiel où seulement deux (voir une) gate est réellement connectée au reservoir
 #      afin de voir si en test les activités des gates non connectées par feedback vont divergé ou non.
 #      (à comparer au cas tout connecté où ça diverge pas).
+#TODO:Vu qu'on apprend en offline et que les sorties sont les mêmes, c'est normal qu'elles soient complètement égales.
+#   --> soit dit en passant : il faudrait qu'elles soient chacune connectées à des sous-parties différentes du réservoir pour que ce ne soit pas le cas -> à   tester un jour pour voir les propriétés
+#   La seule influence différente qu'elles ont, c'est d'avoir des poids de feedback différents, donc elles peuvent avoir une influence différente sur le reservoir (mais en moyenne ça doit pas changer grand chose)
+#   --> là encore, on pourrait tester des feedback concernant seulement une partie du réseau.
+#   --> et si ces feedback changent au cours du temps, peut être est-il possible d'avoir un mécanisme non-supervisé qui adapte la sortie automatiquement
 
 def duplicate_outputs(data, dupl_gate):
     """
