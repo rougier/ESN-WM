@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # Testing data
     n = 50
     values = np.random.randint(0, 10, n)
-    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.15
+    ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.1
     test_data_ = generate_data(values, ticks, last = train_data_["output"][-1])
     test_data = convert_data(test_data_, size)
 
@@ -226,5 +226,5 @@ if __name__ == '__main__':
 
 
     plt.tight_layout()
-    plt.savefig("WM-literal-1-gate.pdf")
+    plt.savefig("result-ESN-literal-1-gate.pdf")
     plt.show()

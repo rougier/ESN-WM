@@ -185,7 +185,7 @@ def str_to_bmp(text, size=11, zmin=1.0, zmax=1.0, add_kerning=False):
         glyph = scipy.ndimage.zoom(glyph, (1, zoom), order=3)
         w = glyph.shape[1]
         x += kerning
-        # left = 0
+        left = 0
         Z[y:y+h,x+left:x+left+w] += glyph
         I[x:x+w] = ord(c)
         x += advance

@@ -50,9 +50,19 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
     W_rc *= radius / np.max(np.abs(np.linalg.eigvals(W_rc)))
 
     W_fb = rng.uniform(-1.0, 1.0, (shape[1], shape[2]))
+    W_fb *= scaling
     # W_fb *= rng.uniform(0.0, 1.0, (shape[1], shape[2])) < 0.25
-    
 
+    if isinstance(noise, (int,float)):
+        noise = { "input":    0,
+                  "internal": noise,
+                  "output":   noise }
+    else:
+        noise = { "input":    noise[0],
+                  "internal": noise[1],
+                  "output":   noise[2] }
+        
+        
     return { "shape"    : shape,
              "sparsity" : sparsity,
              "scaling"  : scaling,
@@ -76,13 +86,21 @@ def train_model(model, data, seed=None):
     internals = np.zeros((len(data), model["shape"][1]))
     leak = model["leak"]
 
+    shape_in = inputs[0].shape
+    shape_rc = internals[0].shape
+    shape_out = outputs[0].shape
+    
     # Gathering internal states over all samples
     for i in tqdm.trange(1, len(data)):
+
+        noise_in = model["noise"]["input"] * rng.uniform(-1, 1, shape_in)
+        noise_rc = model["noise"]["internal"] * rng.uniform(-1, 1, shape_rc)
+        noise_out = model["noise"]["output"] * rng.uniform(-1, 1, shape_out)
+        
         z = (np.dot(model["W_rc"], internals[i-1]) +
-             np.dot(model["W_in"], inputs[i]) +
-             model["scaling"] * np.dot(model["W_fb"], outputs[i-1]))
-        noise = model["noise"] * rng.uniform(-1, 1, z.shape)
-        internals[i,:] = np.tanh(z) + noise
+             np.dot(model["W_in"], inputs[i] + noise_in) +
+             np.dot(model["W_fb"], outputs[i-1] + noise_out))
+        internals[i,:] = np.tanh(z) + noise_rc
         internals[i,:] = (1-leak)*internals[i-1] + leak*internals[i,:]
 
     # Computing W_out over a subset of reservoir units
@@ -102,29 +120,36 @@ def test_model(model, data, seed=None):
     if seed is not None:
         rng = np.random.mtrand.RandomState(seed)
 
+    # Shortened version
     # W_ = model["W_rc"] + model["scaling"] * (model["W_out"]*model["W_fb"])
         
     last_input, last_internal, last_output = model["last_state"]
-    inputs    = np.vstack([last_input, data["input"]])
+    inputs = np.vstack([last_input, data["input"]])
     internals = np.vstack([last_internal,
                            np.zeros((len(data), model["shape"][1]))])
-    outputs   = np.vstack([last_output, data["output"]])
+    outputs = np.vstack([last_output, data["output"]])
     leak = model["leak"]
-    
+    shape_in = inputs[0].shape
+    shape_rc = internals[0].shape
+    shape_out = outputs[0].shape
+
     for i in tqdm.trange(1,len(data)+1):
+
+        noise_in = model["noise"]["input"] * rng.uniform(-1, 1, shape_in)
+        noise_rc = model["noise"]["internal"] * rng.uniform(-1, 1, shape_rc)
+        noise_out = model["noise"]["output"] * rng.uniform(-1, 1, shape_out)
 
         # Regular version
         z = ( np.dot(model["W_rc"], internals[i-1]) +
-              np.dot(model["W_in"], inputs[i]) +
-              model["scaling"]*np.dot(model["W_fb"], outputs[i-1]) )
+              np.dot(model["W_in"], inputs[i] + noise_in) +
+              np.dot(model["W_fb"], outputs[i-1]) )
 
         # Shortened version
         # z = np.dot(W_, internals[i-1]) + np.dot(model["W_in"], inputs[i])
         
-        noise = model["noise"]*(rng.uniform(-1.0, +1.0, z.shape))
-        internals[i] = np.tanh(z) + noise
+        internals[i] = np.tanh(z) + noise_rc
         internals[i,:] = (1-leak)*internals[i-1] + leak*internals[i,:]
-        outputs[i] = np.dot(model["W_out"], internals[i])
+        outputs[i] = np.dot(model["W_out"], internals[i]) + noise_out
 
     model["state"] = internals[1:].T
     model["input"] = inputs[1:]
