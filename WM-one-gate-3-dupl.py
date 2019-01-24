@@ -108,6 +108,11 @@ if __name__ == '__main__':
     print("Training error : {0}".format(error))
     training_error = error #add xav
 
+    print("Rank rewriting:", np.linalg.matrix_rank(np.dot(model["W_fb"], model["W_out"])))
+    print("Difference Wout0 Wout1:", np.linalg.norm(model["W_out"][0]-model["W_out"][1]))
+    print("Difference Wout0 Wout2:", np.linalg.norm(model["W_out"][0]-model["W_out"][2]))
+    print("Difference Wout1 Wout2:", np.linalg.norm(model["W_out"][1]-model["W_out"][2]))
+
     # error = test_model(model, test_data)
     error = test_model(model, test_data, output_noise_scale=out_noise_test) # add output noise only in feedback reinserted in reservoir (not in teacher)
     print("Testing error : {0}".format(error))
