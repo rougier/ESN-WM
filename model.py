@@ -96,12 +96,12 @@ def train_model(model, data, seed=None):
         noise_in = model["noise"]["input"] * rng.uniform(-1, 1, shape_in)
         noise_rc = model["noise"]["internal"] * rng.uniform(-1, 1, shape_rc)
         noise_out = model["noise"]["output"] * rng.uniform(-1, 1, shape_out)
-        
+
         z = (np.dot(model["W_rc"], internals[i-1]) +
              np.dot(model["W_in"], inputs[i] + noise_in) +
              np.dot(model["W_fb"], outputs[i-1] + noise_out))
-        internals[i,:] = np.tanh(z) + noise_rc
-        internals[i,:] = (1-leak)*internals[i-1] + leak*internals[i,:]
+        internals[i] = np.tanh(z) + noise_rc
+        internals[i] = (1-leak)*internals[i-1] + leak*internals[i]
 
     # Computing W_out over a subset of reservoir units
     W_out = np.dot(np.linalg.pinv(internals), outputs).T
@@ -142,14 +142,14 @@ def test_model(model, data, seed=None):
         # Regular version
         z = ( np.dot(model["W_rc"], internals[i-1]) +
               np.dot(model["W_in"], inputs[i] + noise_in) +
-              np.dot(model["W_fb"], outputs[i-1]) )
+              np.dot(model["W_fb"], outputs[i-1] + noise_out) )
 
         # Shortened version
         # z = np.dot(W_, internals[i-1]) + np.dot(model["W_in"], inputs[i])
         
         internals[i] = np.tanh(z) + noise_rc
-        internals[i,:] = (1-leak)*internals[i-1] + leak*internals[i,:]
-        outputs[i] = np.dot(model["W_out"], internals[i]) + noise_out
+        internals[i] = (1-leak)*internals[i-1] + leak*internals[i]
+        outputs[i] = np.dot(model["W_out"], internals[i]) 
 
     model["state"] = internals[1:].T
     model["input"] = inputs[1:]
