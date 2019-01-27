@@ -18,11 +18,15 @@ if __name__ == '__main__':
     
     # Build memory
     n_gate = 1
-    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5,
-                           radius=0.01, scaling=0.25, leak=1.0, noise=0.0001)
+    model = generate_model(shape=(1+n_gate,1000,n_gate),
+                           sparsity=0.5,
+                           radius=0.1,
+                           scaling=0.25,
+                           leak=1.0,
+                           noise=0.0001)
 
     # Training data
-    n = 10000
+    n = 25000
     values = np.random.uniform(-1, +1, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
@@ -44,7 +48,7 @@ if __name__ == '__main__':
         for j in range(n_epoch):
             outputs[i,j] = output
             internals_ = np.tanh((np.dot(model["W_rc"], internals) +
-                                  model["scaling"]*np.dot(model["W_fb"], output)))
+                                  np.dot(model["W_fb"], output)))
             internals = (1-model["leak"])*internals + model["leak"]*internals_
             output = np.dot(model["W_out"], internals)
             
