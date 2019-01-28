@@ -122,7 +122,7 @@ def str_to_bmp(text, size=11, zmin=1.0, zmax=1.0, add_kerning=False):
     return Z/255.0, I
 
 
-def convert_data(data_, size):
+def convert_data(data_, size, noise = 0.):
     values = (data_["input"][:, 0]).astype(int)
     text = [chr(ord("0")+i) for i in values]
     Z, I = str_to_bmp(text, size = size)
@@ -133,7 +133,7 @@ def convert_data(data_, size):
     
     data = np.zeros(Z.shape[1], dtype = [ ("input",  float, (1 + Z.shape[0],)),
                                           ("output", float, (    n_gate,))])
-    data["input"][:, :-1] = Z.T
+    data["input"][:, :-1] = Z.T + noise*np.random.uniform(-1,1, size = Z.T.shape)
     n = Z.shape[1]//len(text)
     data["input"][:,-1] = np.repeat(data_["input"][:, 1], n)
     data["output"][:, 0] = np.repeat(data_["output"], n) / 10
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     values = np.random.randint(0, 10, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.1
     train_data_ = generate_data(values, ticks)
-    train_data = convert_data(train_data_, size)
+    train_data = convert_data(train_data_, size, noise = 0.)
 
 
     # Testing data
@@ -164,12 +164,12 @@ if __name__ == '__main__':
     values = np.random.randint(0, 10, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.1
     test_data_ = generate_data(values, ticks, last = train_data_["output"][-1])
-    test_data = convert_data(test_data_, size)
+    test_data = convert_data(test_data_, size, noise = 0.)
 
     # Model
     model = generate_model(shape=(train_data["input"].shape[1],1000,n_gate),
                            sparsity=0.5, radius=0.1,
-                           scaling=0.25, leak=1.0, noise=0.0001)
+                           scaling=0.25, leak=1.0, noise= 0.0001)
     
     error = train_model(model, train_data)
     print("Training error : {0}".format(error))
