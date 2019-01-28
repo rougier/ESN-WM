@@ -37,6 +37,8 @@ if __name__ == '__main__':
     n_epoch = 500
     vmin, vmax = -5, +5
     outputs = np.zeros((n_value,n_epoch))
+    internals_init = np.zeros((n_value,model["shape"][1]))
+    internals_end = np.zeros((n_value,model["shape"][1]))
     
     for i in tqdm.trange(n_value):
         output = vmin + (vmax-vmin)*(i/(n_value-1)) * np.ones(1)
@@ -44,10 +46,13 @@ if __name__ == '__main__':
         for j in range(n_epoch):
             outputs[i,j] = output
             internals_ = np.tanh((np.dot(model["W_rc"], internals) +
-                                  model["scaling"]*np.dot(model["W_fb"], output)))
+                                  np.dot(model["W_fb"], output)))
             internals = (1-model["leak"])*internals + model["leak"]*internals_
             output = np.dot(model["W_out"], internals)
-            
+ #           if j == 1:
+ #               internals_init[i] = internals
+ #       internals_end[i] = internals
+    
             
     # Display results
     plt.figure(figsize=(10,5))
@@ -71,7 +76,19 @@ if __name__ == '__main__':
     ax.text(0.125, 0.02, "B", transform=ax.transAxes,
             ha="left", va="bottom", fontsize=24, weight="bold")
     plt.plot([0,0], [-1,1], lw="1.5", color="red", zorder=-10)
-
+    """
+    ax = divider.append_axes("right", 1.2, pad=0.1, sharey=ax)
+    ax.plot(np.linalg.norm(internals_init - internals_end, axis = 1),
+            outputs[:,0], color="k")
+    for label in ax.get_yticklabels():
+        label.set_visible(False)
+    ax.axhline(+1.0, color="0.75", linewidth=0.75, zorder=-10)
+    ax.axhline(-1.0, color="0.75", linewidth=0.75, zorder=-10)
+    ax.axvline( 0.0, color="0.75", linewidth=0.75, zorder=-10)
+    ax.text(0.125, 0.02, "C", transform=ax.transAxes,
+            ha="left", va="bottom", fontsize=24, weight="bold")
+    plt.plot([0,0], [-1,1], lw="1.5", color="red", zorder=-10)
+    """
         
     plt.tight_layout()
     plt.savefig("WM-stability.pdf")
