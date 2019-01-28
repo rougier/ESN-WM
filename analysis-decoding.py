@@ -11,11 +11,12 @@
 # 2. Run the model on the training data using Wout & 
 #    record all the internal states of the reservoir
 # 3. Test the model on the test data
-# 4. Measure performance o linear decoder using several restricted (size) sets
-#    of reservoir units using training states from step 2.
+# 4. Measure performance (test data) of a linear decoder using several
+#    restricted (size) sets of reservoir units using training states
+#    from step 2.
 #
 # Condition A: Sets vary in size and are random
-# Condition B: Sets vart in size and use the less correlated units (/ output)
+# Condition B: Sets vary in size and use the less correlated units (/ output)
 # -----------------------------------------------------------------------------
 import os
 import tqdm
