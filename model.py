@@ -56,7 +56,7 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
     if isinstance(noise, (int,float)):
         noise = { "input":    0,
                   "internal": noise,
-                  "output":   noise }
+                  "output":   0     }
     else:
         noise = { "input":    noise[0],
                   "internal": noise[1],
