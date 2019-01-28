@@ -168,8 +168,11 @@ if __name__ == '__main__':
 
     # Model
     model = generate_model(shape=(train_data["input"].shape[1],1000,n_gate),
-                           sparsity=0.5, radius=0.1,
-                           scaling=0.25, leak=1.0, noise= 0.0001)
+                           sparsity=0.5,
+                           radius=0.1,
+                           scaling=0.25,
+                           leak=1.0,
+                           noise=0.0001)
     
     error = train_model(model, train_data)
     print("Training error : {0}".format(error))

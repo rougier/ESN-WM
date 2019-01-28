@@ -4,6 +4,19 @@
 #
 # Distributed under the terms of the BSD License.
 # -----------------------------------------------------------------------------
+# This script tests stability of the reservoir. The protocol is as follows:
+#
+# 1. Train the model using teacher forcing (-> Wout)
+# 2. For output o in [-5,+5]
+#      Choose a random reservoir state
+#      Remove input and force output o at t=0
+#      Iterate over 500 timesteps
+#
+# Expected behavior (after 500 timesteps):
+#  For output(t=0) in [-1,1], no change in output
+#  For output(t=0  > +1, output converges towards +1
+#  For output(t=0) < -1, output converges towards -1
+# -----------------------------------------------------------------------------
 import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,11 +31,15 @@ if __name__ == '__main__':
     
     # Build memory
     n_gate = 1
-    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5,
-                           radius=0.01, scaling=0.25, leak=1.0, noise=0.0001)
+    model = generate_model(shape=(1+n_gate,1000,n_gate),
+                           sparsity=0.5,
+                           radius=0.1,
+                           scaling=0.25,
+                           leak=1.0,
+                           noise=0.0001)
 
     # Training data
-    n = 10000
+    n = 25000
     values = np.random.uniform(-1, +1, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
@@ -91,7 +108,7 @@ if __name__ == '__main__':
     """
         
     plt.tight_layout()
-    plt.savefig("WM-stability.pdf")
+    plt.savefig("analysis-stability.pdf")
     plt.show()
 
 

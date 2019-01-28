@@ -13,21 +13,22 @@ from model import generate_model, train_model, test_model
 if __name__ == '__main__':
 
     # Random generator initialization
-    np.random.seed(123)
+    np.random.seed(1)
 
     # Build memory
     n_gate = 1
-    model = generate_model(shape=(1+n_gate,1000,n_gate), sparsity=0.5,
-                           radius=0.01, scaling=0.25, leak=1.0, noise=0.0001)
+    model = generate_model(shape=(1+n_gate,1000,n_gate),
+                           sparsity=0.5, radius=0.1, scaling=1.0, leak=1.0,
+                           noise=(0, 1e-4, 1e-4))
 
     # Training data
-    n = 10000
+    n = 25000
     values = np.random.uniform(-1, +1, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
 
     # Testing data
-    n = 2000
+    n = 2500
     values = smoothen(np.random.uniform(-1, +1, n))
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     test_data = generate_data(values, ticks, last = train_data["output"][-1])
@@ -113,5 +114,5 @@ if __name__ == '__main__':
              horizontalalignment="left", verticalalignment="top")
 
     plt.tight_layout()
-    plt.savefig("result-ESN-1-gate.pdf")
+    plt.savefig("result-ESN-scalar-1-gate.pdf")
     plt.show()
