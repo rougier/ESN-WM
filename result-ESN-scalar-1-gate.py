@@ -18,11 +18,11 @@ if __name__ == '__main__':
     # Build memory
     n_gate = 1
     model = generate_model(shape=(1+n_gate,1000,n_gate),
-                           sparsity=0.5, radius=0.1, scaling=1.0, leak=1.0,
+                           sparsity=0.5, radius=0.1, scaling=0.25, leak=1.0,
                            noise=(0, 1e-4, 1e-4))
 
     # Training data
-    n = 25000
+    n = 25000 # 300000
     values = np.random.uniform(-1, +1, n)
     ticks = np.random.uniform(0, 1, (n, n_gate)) < 0.01
     train_data = generate_data(values, ticks)
@@ -83,10 +83,13 @@ if __name__ == '__main__':
     from scipy.stats.stats import pearsonr
     n = len(model["state"])
     C = np.zeros(n)
+    idx = np.where(data["input"][:, 1] == 0)[0]
     for i in range(n):
-        C[i], p = pearsonr(model["state"][i].ravel(), model["output"].ravel())
+        C[i], p = pearsonr(model["state"][i, idx].ravel(), model["output"][idx].ravel())
+        #C[i], p = pearsonr(model["state"][i].ravel(), model["output"].ravel())
     I = np.argsort(np.abs(C))
 
+    print(C[I][::-1][:20])
 
     ax3 = plt.subplot(n_subplots, 1, 3, sharex=ax1)
     ax3.tick_params(axis='both', which='major', labelsize=8)
@@ -94,7 +97,8 @@ if __name__ == '__main__':
     for i in range(n):
         ax3.plot(model["state"][I[-1-i]], color='k', alpha=.25, lw=.5)
     ax3.yaxis.tick_right()
-    ax3.set_ylim(-1.1, +1.1)
+    ax3.set_ylim(-0.25, +0.25)
+    #ax3.set_ylim(-1.1, +1.1)
     ax3.set_ylabel("Most correlated\n internal units (n={0})".format(n))
     ax3.text(0.01, 0.9, "C",
              fontsize=16, fontweight="bold", transform=ax3.transAxes,
