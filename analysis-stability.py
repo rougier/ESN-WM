@@ -33,10 +33,10 @@ if __name__ == '__main__':
     n_gate = 1
     model = generate_model(shape=(1+n_gate,1000,n_gate),
                            sparsity=0.5,
-                           radius=0.1,
-                           scaling=0.25,
+                           radius=0.5,
+                           scaling=1.0,
                            leak=1.0,
-                           noise=0.0001)
+                           noise=(0.0000,0.0001, 0.0000))
 
     # Training data
     n = 25000
@@ -66,10 +66,6 @@ if __name__ == '__main__':
                                   np.dot(model["W_fb"], output)))
             internals = (1-model["leak"])*internals + model["leak"]*internals_
             output = np.dot(model["W_out"], internals)
- #           if j == 1:
- #               internals_init[i] = internals
- #       internals_end[i] = internals
-    
             
     # Display results
     plt.figure(figsize=(10,5))

@@ -54,9 +54,9 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
     # W_fb *= rng.uniform(0.0, 1.0, (shape[1], shape[2])) < 0.25
 
     if isinstance(noise, (int,float)):
-        noise = { "input":    0,
+        noise = { "input":    noise,
                   "internal": noise,
-                  "output":   0     }
+                  "output":   noise }
     else:
         noise = { "input":    noise[0],
                   "internal": noise[1],
