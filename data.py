@@ -36,50 +36,56 @@ def smoothen(Z, window='hanning', length=25):
     return 2*Z[(length//2-1):-(length//2)-1]
 
 
-def generate_data(values, ticks, last=None):
+def generate_data(values, gates, last=None):
     """
     This function generates output data for a gated working memory task:
 
-      Considering an input signal S(t) and a tick signal T(t), the output
-      signal O(t) is defined as: O(t) = S(tᵢ) where i = argmax(T(t) = 1).
+    Considering an input signal S(t) and a gate signal T(t), the output
+    signal O(t) is defined as: O(t) = S(tᵢ) where i = argmax(T(t) = 1).
 
     values : np.array
-        Input signal as a single sequence of random float
+        Input signal(s) as one (or several) sequence(s) of random float
 
-    ticks : np.array
+    gates : np.array
         Gating signal(s) as one (or several) sequence(s) of 0 and 1
     """
 
-    values = np.array(values).ravel()
-    ticks = np.array(ticks)
-    if len(ticks.shape) == 1:
-        ticks = ticks.reshape(len(ticks), 1)
-    n_gate = ticks.shape[1]
+
+    values = np.array(values)
+    if len(values.shape) == 1:
+        values = values.reshape(len(values), 1)
+    n_values = values.shape[1]
+        
+    gates = np.array(gates)
+    if len(gates.shape) == 1:
+        gates = gates.reshape(len(gates), 1)
+    n_gates = gates.shape[1]
+
     size = len(values)
-
-    data = np.zeros(size, dtype = [ ("input",  float, (1 + n_gate,)),
-                                    ("output", float, (    n_gate,))])
+    
+    data = np.zeros(size, dtype = [ ("input",  float, (n_values + n_gates,)),
+                                    ("output", float, (           n_gates,))])
     # Input signals
-    data["input"][:,0 ] = values
-    data["input"][:,1:] = ticks
+    data["input"][:, 0:n_values ] = values
+    data["input"][:, n_values: ] = gates
 
 
-    wm = np.zeros(n_gate)
-    # If no last activity set tick=1 at time t=0
+    wm = np.zeros(n_gates)
+    # If no last activity set gate=1 at time t=0
     if last is None:
         wm[:] = data["input"][0, 0]
         data["input"][0, 1:] = 1
     else:
         wm[:] = last
 
-    # Output value(s) according to ticks
+    # Output value(s) according to gates
     for i in range(size):
-        for j in range(n_gate):
-            # Output at time of tick is not changed
+        for j in range(n_gates):
+            # Output at time of gate is not changed
             # data["output"][i,j] = wm[j]
-            if data["input"][i,1+j] > 0:
+            if data["input"][i,n_values+j] > 0:
                 wm[j] = data["input"][i,0]
-            # Output at time of tick is changed
+            # Output at time of gate is changed
             data["output"][i,j] = wm[j]
 
     return data
@@ -193,6 +199,23 @@ def str_to_bmp(text, size=11, zmin=1.0, zmax=1.0, add_kerning=False):
 
     return Z/255.0, I
 
+def convert_data(data_, size, noise = 0.):
+    values = (data_["input"][:, 0]).astype(int)
+    text = [chr(ord("0")+i) for i in values]
+    Z, I = str_to_bmp(text, size = size)
+    Z = Z [3:-3]
+    n_gate = data_["output"].shape[1]
+    
+    # Z *= np.random.uniform(0.9,1.1,Z.shape)
+    # Z = np.maximum(np.minimum(Z,1),0)
+    
+    data = np.zeros(Z.shape[1], dtype = [ ("input",  float, (1 + Z.shape[0],)),
+                                          ("output", float, (    n_gate,))])
+    data["input"][:, :-1] = Z.T + noise*np.random.uniform(-1,1, size = Z.T.shape)
+    n = Z.shape[1]//len(text)
+    data["input"][:,-1] = np.repeat(data_["input"][:, 1], n)
+    data["output"][:, 0] = np.repeat(data_["output"], n) / 10
+    return data
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

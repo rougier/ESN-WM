@@ -26,7 +26,9 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
         Spectral radius
 
     scaling: float
-        Feedback scaling
+        scaling of the reservoir input and feedback as (i,f)
+          i: Input scaling
+          f: Feedback scaling
 
     leak: float
         Neuron leak
@@ -43,14 +45,24 @@ def generate_model(shape, sparsity=0.25, radius=1.0, scaling=0.25,
     if seed is not None:
         rng = np.random.mtrand.RandomState(seed)
     
+    if isinstance(scaling, (int,float)):
+        scaling = { "in":    1,
+                  "fb": scaling
+                }
+    else:
+        scaling = { "in":    scaling[0],
+                  "fb": scaling[1],
+                }
+
     # Reservoir building
     W_in = rng.uniform(-1.0, 1.0, (shape[1], shape[0]))
+    W_in *= scaling["in"]
     W_rc = rng.uniform(-0.5, 0.5, (shape[1], shape[1]))
     W_rc[rng.uniform(0.0, 1.0, W_rc.shape) > sparsity] = 0.0
     W_rc *= radius / np.max(np.abs(np.linalg.eigvals(W_rc)))
 
     W_fb = rng.uniform(-1.0, 1.0, (shape[1], shape[2]))
-    W_fb *= scaling
+    W_fb *= scaling["fb"]
     # W_fb *= rng.uniform(0.0, 1.0, (shape[1], shape[2])) < 0.25
 
     if isinstance(noise, (int,float)):
